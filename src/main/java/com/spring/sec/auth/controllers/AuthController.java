@@ -4,46 +4,34 @@ import com.spring.sec.auth.requests.LoginRequest;
 import com.spring.sec.auth.model.LoginResponse;
 import com.spring.sec.auth.security.JwtIssuer;
 import com.spring.sec.auth.security.UserPrincipal;
+import com.spring.sec.auth.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("api")
 public class AuthController {
 
     private final JwtIssuer jwtIssuer;
 
     private final AuthenticationManager authenticationManager;
 
-    @PostMapping("/auth/login")
-    public LoginResponse loginResponse(@RequestBody @Validated LoginRequest request){
-        var authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+    private final AuthService authService;
 
-        //get the context of the security from the generated from the successful logged in
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        //extract the principal which is the valid user that has been logged in
-        var principal = (UserPrincipal)authentication.getPrincipal(); //casting into UserPrincipal
-
-        //mapping all the user roles into principal authorities.
-        var roles = principal.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-
-        var token = jwtIssuer.issue(principal.getId(),principal.getEmail(),roles);
-        return LoginResponse.builder()
-                .accessToken(token)
-                .build();
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody @Validated LoginRequest request){
+        return authService.attemptLogin(request.getEmail(), request.getPassword());
     }
 }

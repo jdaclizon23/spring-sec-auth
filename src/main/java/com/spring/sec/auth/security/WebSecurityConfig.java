@@ -37,10 +37,11 @@ public class WebSecurityConfig {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().formLogin().disable()
-                .securityMatcher("/api/**") //prefix routes named api
+                .securityMatcher("/**") //working root dir,
                 .authorizeHttpRequests(registry -> registry
-                        .requestMatchers("/api").permitAll()
-                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/").permitAll() //non-secured endpoints
+                        .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
         return http.build();
@@ -50,8 +51,6 @@ public class WebSecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception {
