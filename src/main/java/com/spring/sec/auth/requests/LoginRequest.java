@@ -1,4 +1,4 @@
-package com.spring.sec.auth.model;
+package com.spring.sec.auth.requests;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -19,7 +19,7 @@ public class JwtIssuer {
         return JWT.create()
                 .withSubject(String.valueOf(userId))
                 .withExpiresAt(Instant.now().plus(Duration.of(1, ChronoUnit.DAYS)))
-                .withClaim("e",email )
+                .withClaim("e",email)
                 .withClaim("a",roles)
                 .sign(Algorithm.HMAC256(jwtProperties.getSecret()));
     }
