@@ -35,3 +35,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+caches
+daemon
+gradle
+wrapper
+.tmp
+native
